@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}Calendrier - 2familles{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Bouton Nouvel événement -->
+                    <button class="btn btn-primary w-100 mb-4" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                        <i class="fas fa-plus"></i> Nouvel événement
+                    </button>
+
+                    <!-- Filtres -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Filtrer par enfant</h5>
+                        {% for child in children %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input child-filter" type="checkbox" value="{{ child.id }}" 
+                                   id="child-{{ child.id }}" checked>
+                            <label class="form-check-label" for="child-{{ child.id }}">
+                                <span class="color-dot" style="background-color: {{ child.color }};"></span>
+                                {{ child.first_name }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Types d'événements -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Type d'événement</h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input event-type-filter" type="checkbox" value="all" 
+                                   id="type-all" checked>
+                            <label class="form-check-label" for="type-all">
+                                Tous les types
+                            </label>
+                        </div>
+                        
+                        <!-- Liste des types d'événements -->
+                        <div class="form-check mb-2">
+                            <input class="form-check-input event-type-filter" type="checkbox" value="Médical" 
+                                   id="type-medical" checked>
+                            <label class="form-check-label" for="type-medical">
+                                Médical
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input event-type-filter" type="checkbox" value="École" 
+                                   id="type-ecole" checked>
+                            <label class="form-check-label" for="type-ecole">
+                                École
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input event-type-filter" type="checkbox" value="Activité" 
+                                   id="type-activite" checked>
+                            <label class="form-check-label" for="type-activite">
+                                Activité
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input event-type-filter" type="checkbox" value="Garde" 
+                                   id="type-garde" checked>
+                            <label class="form-check-label" for="type-garde">
+                                Garde
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input event-type-filter" type="checkbox" value="Autre" 
+                                   id="type-autre" checked>
+                            <label class="form-check-label" for="type-autre">
+                                Autre
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Export buttons -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Exporter</h5>
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('calendar.export_events', format='csv') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-file-csv"></i> Exporter en CSV
+                            </a>
+                            <a href="{{ url_for('calendar.export_events', format='pdf') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-file-pdf"></i> Exporter en PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendrier -->
+        <div class="col-md-9">
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'ajout d'événement -->
+{% include 'modals/add_event_modal.html' %}
+{% endblock %}
+
+{% block styles %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet'>
+<style>
+.fc {
+    height: calc(100vh - 200px);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.fc-event {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.fc-event:hover {
+    transform: scale(1.02);
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-outline-primary {
+    border-width: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.btn-outline-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.min.js'></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+        locale: 'fr',
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: "{{ url_for('calendar.get_events') }}",
+        editable: true,
+        selectable: true,
+        selectMirror: true,
+        dayMaxEvents: true,
+        eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }
+    });
+    
+    calendar.render();
+});
+</script>
+{% endblock %}

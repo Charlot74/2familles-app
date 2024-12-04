@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Voir le message{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ message.subject }}</h4>
+                        <a href="{{ url_for('messaging.inbox') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </a>
+                    </div>
+                    <div class="text-muted mt-2">
+                        <div>
+                            De: {{ message.sender.first_name }} {{ message.sender.last_name }}
+                            <span class="text-muted">&lt;{{ message.sender.email }}&gt;</span>
+                        </div>
+                        <div>
+                            À: {{ message.receiver.first_name }} {{ message.receiver.last_name }}
+                            <span class="text-muted">&lt;{{ message.receiver.email }}&gt;</span>
+                        </div>
+                        <div>{{ message.created_at.strftime('%d/%m/%Y à %H:%M') }}</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="message-content mb-4">
+                        {{ message.content|nl2br }}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if current_user.id == message.receiver_id %}
+                            <a href="{{ url_for('messaging.compose', reply_to=message.id) }}" class="btn btn-primary">
+                                <i class="fas fa-reply"></i> Répondre
+                            </a>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if current_user.id in [message.sender_id, message.receiver_id] %}
+                            <form action="{{ url_for('messaging.delete', message_id=message.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?')">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.message-content {
+    white-space: pre-wrap;
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+</style>
+{% endblock %}

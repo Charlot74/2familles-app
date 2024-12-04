@@ -1,0 +1,87 @@
+<div class="modal fade" id="addExpenseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle"></i> Nouvelle dépense
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('budget.add') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label required">Titre</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="amount" class="form-label required">Montant</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="amount" name="amount" 
+                                       step="0.01" min="0" required>
+                                <select class="form-select" name="currency" style="max-width: 100px;">
+                                    {% for code, symbol in currencies.items() %}
+                                        <option value="{{ code }}" {% if code == current_user.currency %}selected{% endif %}>
+                                            {{ symbol }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="date" class="form-label required">Date</label>
+                            <input type="date" class="form-control" id="date" name="date" 
+                                   value="{{ today_date }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="category" class="form-label required">Catégorie</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Sélectionner...</option>
+                                <option value="Alimentation">Alimentation</option>
+                                <option value="Santé">Santé</option>
+                                <option value="Éducation">Éducation</option>
+                                <option value="Vêtements">Vêtements</option>
+                                <option value="Loisirs">Loisirs</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="child_id" class="form-label">Enfant concerné</label>
+                            <select class="form-select" id="child_id" name="child_id">
+                                <option value="">Tous les enfants</option>
+                                {% for child in children %}
+                                    <option value="{{ child.id }}">{{ child.first_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.required::after {
+    content: " *";
+    color: red;
+}
+</style>

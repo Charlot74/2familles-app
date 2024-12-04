@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Budget - 2familles{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-wallet"></i> Gestion du budget
+                    </h5>
+                    <div class="btn-group">
+                        <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+                            <i class="fas fa-plus"></i> Nouvelle dépense
+                        </button>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-download"></i> Exporter
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('budget.export_budget', format='csv') }}">
+                                        <i class="fas fa-file-csv"></i> Format CSV
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('budget.export_budget', format='pdf') }}">
+                                        <i class="fas fa-file-pdf"></i> Format PDF
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Titre</th>
+                                    <th>Catégorie</th>
+                                    <th>Enfant</th>
+                                    <th class="text-end">Montant</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in expenses %}
+                                <tr>
+                                    <td>{{ expense.formatted_date() }}</td>
+                                    <td>{{ expense.title }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ expense.category }}</span>
+                                    </td>
+                                    <td>
+                                        {% if expense.child %}
+                                            <span class="badge" style="background-color: {{ expense.child.color }}">
+                                                {{ expense.child.first_name }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Tous</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">{{ expense.formatted_amount() }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('budget.edit', id=expense.id) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="confirmDelete({{ expense.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <form id="delete-form-{{ expense.id }}" 
+                                              action="{{ url_for('budget.delete', id=expense.id) }}" 
+                                              method="POST" style="display: none;"></form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-primary">
+                                    <td colspan="4" class="text-end"><strong>Totaux:</strong></td>
+                                    <td class="text-end">
+                                        {% for currency, total in total_by_currency.items() %}
+                                            <div><strong>{{ "%.2f"|format(total) }} {{ currencies[currency] }}</strong></div>
+                                        {% endfor %}
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'ajout de dépense -->
+{% include 'modals/add_expense_modal.html' %}
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer cette dépense ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" onclick="deleteExpense()">
+                    <i class="fas fa-trash"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let expenseToDelete = null;
+
+function confirmDelete(id) {
+    expenseToDelete = id;
+    new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+}
+
+function deleteExpense() {
+    if (expenseToDelete) {
+        document.getElementById(`delete-form-${expenseToDelete}`).submit();
+    }
+}
+</script>
+{% endblock %}

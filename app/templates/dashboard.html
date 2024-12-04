@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord - 2familles{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Colonne gauche pour les infos personnelles -->
+        <div class="col-lg-5">
+            <!-- Mon Profil -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user"></i> Mon Profil
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="mb-2"><strong><i class="fas fa-user-circle me-2"></i>Nom :</strong> {{ current_user.username }}</p>
+                        <p class="mb-2"><strong><i class="fas fa-envelope me-2"></i>Email :</strong> {{ current_user.email }}</p>
+                    </div>
+                    <a href="{{ url_for('main.edit_profile') }}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-pencil-alt"></i> Modifier mon profil
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mes Enfants -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-child"></i> Mes Enfants
+                    </h5>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addChildModal">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if children %}
+                        {% for child in children %}
+                            <div class="d-flex justify-content-between align-items-center p-3 mb-2 rounded"
+                                 style="background-color: {{ child.color }}15;">
+                                <div class="d-flex align-items-center">
+                                    <div class="color-dot me-3" style="background-color: {{ child.color }};"></div>
+                                    <div>
+                                        <strong>{{ child.first_name }} {{ child.last_name }}</strong><br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-birthday-cake"></i> {{ child.birth_date.strftime('%d/%m/%Y') }}
+                                        </small>
+                                    </div>
+                                </div>
+                                <button class="btn btn-link text-primary" data-bs-toggle="modal"
+                                        data-bs-target="#editChildModal{{child.id}}">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-child fa-3x text-primary mb-3"></i>
+                            <p class="text-muted mb-0">Aucun enfant enregistré</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Co-parent -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-friends"></i> Co-parent
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if coparent %}
+                        <div class="mb-3">
+                            <p class="mb-2"><strong><i class="fas fa-user-circle me-2"></i>Nom :</strong> {{ coparent.username }}</p>
+                            <p class="mb-2"><strong><i class="fas fa-envelope me-2"></i>Email :</strong> {{ coparent.email }}</p>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                            <p class="text-muted mb-3">Aucun co-parent associé</p>
+                            <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#inviteCoparentModal">
+                                <i class="fas fa-envelope"></i> Inviter le co-parent
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne droite pour les sections Planning, Budget et Informations -->
+        <div class="col-lg-7">
+            <!-- Planning -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-alt"></i> Planning
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-4">Prochains événements</h6>
+                    {% if upcoming_events %}
+                        <div class="list-group mb-4">
+                            {% for event in upcoming_events %}
+                                <div class="list-group-item border-0 mb-2 rounded event-item"
+                                     style="background-color: {{ event.children[0].color if event.children else '#f8f9fa' }}15;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ event.title }}</h6>
+                                            <small class="text-muted">
+                                                <i class="far fa-clock"></i> {{ event.start_time.strftime('%d/%m/%Y %H:%M') }}
+                                            </small>
+                                            {% if event.description %}
+                                                <p class="mb-0 small text-muted">{{ event.description }}</p>
+                                            {% endif %}
+                                        </div>
+                                        {% if event.children %}
+                                            {% for child in event.children %}
+                                                <span class="badge" style="background-color: {{ child.color }}">
+                                                    {{ child.first_name }}
+                                                </span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4 mb-4">
+                            <i class="far fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">Aucun événement à venir</p>
+                        </div>
+                    {% endif %}
+                    <a href="{{ url_for('calendar.index') }}" class="btn btn-primary w-100">
+                        <i class="fas fa-calendar-alt"></i> Voir le planning complet
+                    </a>
+                </div>
+            </div>
+
+            <!-- Budget -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-coins"></i> Budget
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="border rounded p-3 text-center h-100">
+                                <h6 class="text-muted mb-3">Dépenses du mois</h6>
+                                {% if monthly_expenses %}
+                                    {% for expense in monthly_expenses %}
+                                        <h3 class="text-primary mb-2">{{ expense }}</h3>
+                                    {% endfor %}
+                                {% else %}
+                                    <h3 class="text-primary mb-0">0.00 €</h3>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('budget.index') }}" class="btn btn-primary w-100">
+                        <i class="fas fa-chart-line"></i> Gérer le budget
+                    </a>
+                </div>
+            </div>
+
+            <!-- Informations -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Informations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="border rounded p-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="text-muted mb-0">Dernières informations</h6>
+                                    <span class="badge bg-primary">{{ information|length if information else 0 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('information.index') }}" class="btn btn-primary w-100">
+                        <i class="fas fa-folder-open"></i> Gérer les informations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+{% include 'modals/invite_coparent_modal.html' %}
+{% include 'modals/add_child_modal.html' %}
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background: none;
+    border-bottom: none;
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.event-item:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}
+
+.badge {
+    font-weight: 500;
+}
+</style>
+{% endblock %}

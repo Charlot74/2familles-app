@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter des informations familiales{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>Ajouter un enfant</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="child_name" class="form-label">Nom de l'enfant</label>
+                        <input type="text" class="form-control" id="child_name" name="child_name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="child_birthdate" class="form-label">Date de naissance</label>
+                        <input type="date" class="form-control" id="child_birthdate" name="child_birthdate" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="medical_info" class="form-label">Informations médicales</label>
+                        <textarea class="form-control" id="medical_info" name="medical_info" rows="3" 
+                                placeholder="Allergies, traitements en cours, etc."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="school_info" class="form-label">Informations scolaires</label>
+                        <textarea class="form-control" id="school_info" name="school_info" rows="3"
+                                placeholder="École, classe, activités parascolaires, etc."></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                        <a href="{{ url_for('family.index') }}" class="btn btn-secondary">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

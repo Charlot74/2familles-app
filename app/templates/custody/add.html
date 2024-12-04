@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter une période de garde{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Nouvelle période de garde</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <!-- Sélection de l'enfant -->
+                        <div class="mb-3">
+                            <label for="child_id" class="form-label">Enfant</label>
+                            <select class="form-select" id="child_id" name="child_id" required>
+                                <option value="">Sélectionner un enfant</option>
+                                {% for child in children %}
+                                <option value="{{ child.id }}">{{ child.child_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner un enfant.
+                            </div>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="start_date" class="form-label">Date de début</label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="start_date" 
+                                       name="start_date" 
+                                       required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="end_date" class="form-label">Date de fin</label>
+                                <input type="datetime-local" 
+                                       class="form-control" 
+                                       id="end_date" 
+                                       name="end_date" 
+                                       required>
+                            </div>
+                        </div>
+
+                        <!-- Type de garde -->
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type de garde</label>
+                            <select class="form-select" id="type" name="type">
+                                <option value="regular">Régulier</option>
+                                <option value="holiday">Vacances</option>
+                                <option value="special">Spécial</option>
+                            </select>
+                        </div>
+
+                        <!-- Récurrence -->
+                        <div class="mb-3">
+                            <label for="recurrence" class="form-label">Récurrence</label>
+                            <select class="form-select" id="recurrence" name="recurrence">
+                                <option value="none">Aucune</option>
+                                <option value="weekly">Hebdomadaire</option>
+                                <option value="biweekly">Bi-hebdomadaire</option>
+                                <option value="monthly">Mensuelle</option>
+                            </select>
+                        </div>
+
+                        <!-- Couleur -->
+                        <div class="mb-3">
+                            <label for="color" class="form-label">Couleur</label>
+                            <input type="color" 
+                                   class="form-control form-control-color" 
+                                   id="color" 
+                                   name="color" 
+                                   value="#BB2D0C">
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="3"></textarea>
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('custody.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

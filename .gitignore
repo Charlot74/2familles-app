@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environnement virtuel
+venv/
+.venv/
+ENV/
+
+# Base de données
+*.db
+*.sqlite
+
+# Fichiers de configuration
+.env
+.flaskenv
+instance/
+config.local.py
+
+# Système
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Fichiers média uploadés
+app/static/uploads/

@@ -1,0 +1,84 @@
+<div class="modal fade" id="addChildModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-baby"></i> Ajouter un enfant
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('main.add_child') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">Prénom</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="birth_date" class="form-label">Date de naissance</label>
+                        <input type="date" class="form-control" id="birth_date" name="birth_date" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Couleur d'identification</label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% for color in ['#FF6B6B', '#4ECDC4', '#95E1D3', '#F7D794', '#786FA6', '#F8A5C2'] %}
+                                <div class="color-option">
+                                    <input type="radio" name="color" value="{{ color }}" 
+                                           id="color_{{ loop.index }}" 
+                                           {% if loop.first %}required{% endif %}>
+                                    <label for="color_{{ loop.index }}" 
+                                           class="color-circle" 
+                                           style="background-color: {{ color }};"></label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Ajouter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.color-option {
+    position: relative;
+}
+
+.color-option input[type="radio"] {
+    display: none;
+}
+
+.color-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.color-option input[type="radio"]:checked + .color-circle {
+    border-color: #0d6efd;
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #0d6efd;
+}
+
+.color-circle:hover {
+    transform: scale(1.1);
+}
+</style>

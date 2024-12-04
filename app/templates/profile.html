@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier mon profil - 2Familles{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Colonne de gauche : Informations personnelles -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-gear"></i> Modifier mon profil
+                    </h5>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light btn-sm">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.edit_profile') }}" class="needs-validation" novalidate>
+                        <!-- Informations personnelles -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Informations personnelles</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" name="first_name" value="{{ current_user.first_name }}" required>
+                                    <div class="invalid-feedback">Le prénom est requis</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nom</label>
+                                    <input type="text" class="form-control" name="last_name" value="{{ current_user.last_name }}" required>
+                                    <div class="invalid-feedback">Le nom est requis</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coordonnées -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Coordonnées</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" value="{{ current_user.email }}" required>
+                                <div class="invalid-feedback">Veuillez entrer une adresse email valide</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" class="form-control" name="phone_number" value="{{ current_user.phone_number or '' }}" placeholder="Ex: 06 12 34 56 78">
+                                <div class="form-text">Le numéro de téléphone est optionnel</div>
+                            </div>
+                        </div>
+
+                        <!-- Sécurité -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Sécurité</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Nouveau mot de passe</label>
+                                <input type="password" class="form-control" name="password" minlength="6">
+                                <div class="form-text">Laissez vide pour conserver le mot de passe actuel</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Confirmation du nouveau mot de passe</label>
+                                <input type="password" class="form-control" name="password_confirm" minlength="6">
+                                <div class="invalid-feedback">Les mots de passe ne correspondent pas</div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check2-circle"></i> Enregistrer les modifications
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne de droite : Co-parent -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people"></i> Co-parent
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if current_user.coparent %}
+                        <div class="text-center mb-3">
+                            <i class="bi bi-person-check-fill text-success fs-1"></i>
+                            <h6 class="mt-2">{{ current_user.coparent.first_name }} {{ current_user.coparent.last_name }}</h6>
+                            <p class="text-muted mb-0">{{ current_user.coparent.email }}</p>
+                            <small class="text-muted">Compte lié</small>
+                        </div>
+                    {% elif pending_invitation %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Invitation en attente
+                            <p class="small mb-0">Envoyée à {{ pending_invitation.email }}<br>
+                            le {{ pending_invitation.created_at.strftime('%d/%m/%Y') }}</p>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#inviteCoParentModal">
+                            <i class="bi bi-envelope"></i> Renvoyer l'invitation
+                        </button>
+                    {% else %}
+                        <div class="text-center mb-3">
+                            <i class="bi bi-person-plus fs-1 text-muted"></i>
+                            <p class="mt-2">Aucun co-parent associé</p>
+                        </div>
+                        <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#inviteCoParentModal">
+                            <i class="bi bi-envelope-plus"></i> Inviter le co-parent
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Invitation Co-parent -->
+<div class="modal fade" id="inviteCoParentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('main.invite_coparent') }}" class="needs-validation" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-envelope-plus"></i> Inviter le co-parent
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Le co-parent recevra un email contenant votre invitation et un lien pour rejoindre l'application.
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Email du co-parent</label>
+                        <input type="email" class="form-control" name="coparent_email" required>
+                        <div class="form-text">Assurez-vous que cette adresse email est correcte et active.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label d-flex justify-content-between">
+                            Message d'invitation
+                            <button type="button" class="btn btn-link btn-sm p-0" onclick="resetDefaultMessage()">
+                                <i class="bi bi-arrow-counterclockwise"></i> Message par défaut
+                            </button>
+                        </label>
+                        <textarea class="form-control" name="message" rows="6" id="invitationMessage" required>Je t'invite à rejoindre l'application 2familles, qui est spécialement conçue pour les personnes séparées et divorcées. Elle propose un agenda partagé, une banque d'informations et des outils pour gérer nos finances communes concernant les enfants. Cela pourrait vraiment nous aider à mieux organiser notre situation. J'espère que tu accepteras cette invitation !</textarea>
+                        <div class="form-text">
+                            Vous pouvez personnaliser ce message si vous le souhaitez.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Envoyer l'invitation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+function resetDefaultMessage() {
+    const defaultMessage = `Je t'invite à rejoindre l'application 2familles, qui est spécialement conçue pour les personnes séparées et divorcées. Elle propose un agenda partagé, une banque d'informations et des outils pour gérer nos finances communes concernant les enfants. Cela pourrait vraiment nous aider à mieux organiser notre situation. J'espère que tu accepteras cette invitation !`;
+    document.getElementById('invitationMessage').value = defaultMessage;
+}
+
+// Validation du formulaire
+(function() {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+
+            // Vérification des mots de passe
+            const password = form.querySelector('input[name="password"]')
+            const passwordConfirm = form.querySelector('input[name="password_confirm"]')
+            if (password && passwordConfirm && password.value && password.value !== passwordConfirm.value) {
+                event.preventDefault()
+                passwordConfirm.setCustomValidity('Les mots de passe ne correspondent pas')
+            } else if (passwordConfirm) {
+                passwordConfirm.setCustomValidity('')
+            }
+
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

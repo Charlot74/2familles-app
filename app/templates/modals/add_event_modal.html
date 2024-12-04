@@ -1,0 +1,110 @@
+<div class="modal fade" id="addEventModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-plus"></i> Nouvel événement
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('calendar.add_event') }}" method="POST">
+                <div class="modal-body">
+                    <!-- Titre -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label required">Titre</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_time" class="form-label required">Date de début</label>
+                            <input type="datetime-local" class="form-control" id="start_time" name="start_time" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_time" class="form-label required">Date de fin</label>
+                            <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
+                        </div>
+                    </div>
+
+                    <!-- Type d'événement -->
+                    <div class="mb-3">
+                        <label for="event_type" class="form-label required">Type d'événement</label>
+                        <select class="form-select" id="event_type" name="event_type" required>
+                            <option value="">Sélectionnez un type</option>
+                            <option value="Médical">Médical</option>
+                            <option value="École">École</option>
+                            <option value="Activité">Activité</option>
+                            <option value="Garde">Garde</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+
+                    <!-- Lieu -->
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Lieu</label>
+                        <input type="text" class="form-control" id="location" name="location">
+                    </div>
+
+                    <!-- Enfants concernés -->
+                    <div class="mb-3">
+                        <label class="form-label">Enfant(s) concerné(s)</label>
+                        <div class="child-list">
+                            {% for child in children %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="children" value="{{ child.id }}" 
+                                       id="child-{{ child.id }}">
+                                <label class="form-check-label" for="child-{{ child.id }}">
+                                    <span class="color-dot" style="background-color: {{ child.color }};"></span>
+                                    {{ child.first_name }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.required::after {
+    content: " *";
+    color: red;
+}
+
+.color-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.child-list {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.form-check {
+    margin-bottom: 8px;
+}
+</style>

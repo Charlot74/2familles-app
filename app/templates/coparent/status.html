@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Statut Co-parent{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- État actuel -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">État de la Co-parentalité</h5>
+                </div>
+                <div class="card-body">
+                    {% set coparent = current_user.get_coparent() %}
+                    {% if coparent %}
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-people-fill display-4 text-success"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-4">
+                                <h4 class="mb-2">Relation Co-parent active</h4>
+                                <p class="mb-1"><strong>Co-parent :</strong> {{ coparent.first_name }} {{ coparent.last_name }}</p>
+                                <p class="mb-1"><strong>Email :</strong> {{ coparent.email }}</p>
+                                <p class="mb-0"><strong>Date d'association :</strong> 
+                                    {{ current_user.family_info.first().created_at.strftime('%d/%m/%Y') }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-people display-4 text-muted"></i>
+                            <h4 class="mt-3">Aucun co-parent associé</h4>
+                            <p class="text-muted mb-4">Vous n'avez pas encore de co-parent associé à votre compte.</p>
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Inviter un co-parent
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Invitations envoyées -->
+            {% if sent_invitations %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Invitations envoyées</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for invitation in sent_invitations %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ invitation.recipient_email }}</h6>
+                                    <small class="text-muted">
+                                        Envoyée le {{ invitation.created_at.strftime('%d/%m/%Y à %H:%M') }}
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if invitation.status == 'pending' %}
+                                        <span class="badge bg-warning">En attente</span>
+                                        <form action="{{ url_for('coparent.cancel_invitation', invitation_id=invitation.id) }}" 
+                                              method="POST" class="d-inline ms-2">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                Annuler
+                                            </button>
+                                        </form>
+                                    {% elif invitation.status == 'accepted' %}
+                                        <span class="badge bg-success">Acceptée</span>
+                                    {% elif invitation.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejetée</span>
+                                    {% elif invitation.status == 'expired' %}
+                                        <span class="badge bg-secondary">Expirée</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Invitations reçues -->
+            {% if received_invitations %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Invitations reçues</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for invitation in received_invitations %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">De : {{ invitation.sender.email }}</h6>
+                                    <small class="text-muted">
+                                        Reçue le {{ invitation.created_at.strftime('%d/%m/%Y à %H:%M') }}
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if invitation.status == 'pending' %}
+                                        <a href="{{ url_for('coparent.accept_invitation', token=invitation.token) }}" 
+                                           class="btn btn-sm btn-success me-2">Accepter</a>
+                                        <form action="{{ url_for('coparent.reject_invitation', token=invitation.token) }}" 
+                                              method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger">Refuser</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ invitation.status }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

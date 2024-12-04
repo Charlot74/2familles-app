@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Planning de Garde{% endblock %}
+
+{% block styles %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet'>
+<style>
+.fc-event {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.fc-event:hover {
+    transform: scale(1.02);
+}
+
+.custody-legend {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.exchange-requests {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.calendar-filters {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Barre latérale -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Planning de Garde</h5>
+                    <a href="{{ url_for('custody.add') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Filtres -->
+                    <div class="calendar-filters">
+                        <div class="mb-3">
+                            <label class="form-label">Enfant</label>
+                            <select class="form-select" id="childFilter">
+                                <option value="">Tous les enfants</option>
+                                {% for child in children %}
+                                <option value="{{ child.id }}">{{ child.child_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" id="typeFilter">
+                                <option value="">Tous les types</option>
+                                <option value="regular">Régulier</option>
+                                <option value="holiday">Vacances</option>
+                                <option value="special">Spécial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Légende -->
+                    <div class="custody-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #BB2D0C"></div>
+                            <span>Régulier</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #4CAF50"></div>
+                            <span>Vacances</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #9C27B0"></div>
+                            <span>Spécial</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demandes d'échange -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Demandes d'échange</h5>
+                </div>
+                <div class="card-body exchange-requests">
+                    {% if exchange_requests %}
+                        {% for request in exchange_requests %}
+                        <div class="exchange-request mb-3 p-3 border rounded">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ request.requester.first_name }}</h6>
+                                    <p class="text-muted mb-1">
+                                        Du: {{ request.proposed_start.strftime('%d/%m/%Y') }}<br>
+                                        Au: {{ request.proposed_end.strftime('%d/%m/%Y') }}
+                                    </p>
+                                    {% if request.reason %}
+                                    <p class="mb-2"><small>{{ request.reason }}</small></p>
+                                    {% endif %}
+                                </div>
+                                {% if request.recipient_id == current_user.id %}
+                                <div class="btn-group-vertical btn-group-sm">
+                                    <button class="btn btn-success btn-sm accept-exchange" 
+                                            data-exchange-id="{{ request.id }}">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm reject-exchange" 
+                                            data-exchange-id="{{ request.id }}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center">Aucune demande d'échange en attente</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendrier -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'échange -->
+<div class="modal fade" id="exchangeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Demander un échange</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exchangeForm">
+                    <input type="hidden" id="scheduleId" name="schedule_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nouvelle date de début</label>
+                        <input type="datetime-local" class="form-control" id="proposedStart" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nouvelle date de fin</label>
+                        <input type="datetime-local" class="form-control" id="proposedEnd" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Raison de l'échange</label>
+                        <textarea class="form-control" id="exchangeReason" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="submitExchange">Envoyer la demande</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

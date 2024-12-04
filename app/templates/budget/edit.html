@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Modifier la dépense - 2familles{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit"></i> Modifier la dépense
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="title" class="form-label required">Titre</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ expense.title }}" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="amount" class="form-label required">Montant</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="amount" name="amount" 
+                                           step="0.01" min="0" value="{{ expense.amount }}" required>
+                                    <select class="form-select" name="currency" style="max-width: 100px;">
+                                        {% for code, symbol in currencies.items() %}
+                                            <option value="{{ code }}" {% if code == expense.currency %}selected{% endif %}>
+                                                {{ symbol }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="date" class="form-label required">Date</label>
+                                <input type="date" class="form-control" id="date" name="date" 
+                                       value="{{ expense.date.strftime('%Y-%m-%d') }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="category" class="form-label required">Catégorie</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Sélectionner...</option>
+                                    {% for category in ['Alimentation', 'Santé', 'Éducation', 'Vêtements', 'Loisirs', 'Transport', 'Autre'] %}
+                                        <option value="{{ category }}" {% if category == expense.category %}selected{% endif %}>
+                                            {{ category }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="child_id" class="form-label">Enfant concerné</label>
+                                <select class="form-select" id="child_id" name="child_id">
+                                    <option value="">Tous les enfants</option>
+                                    {% for child in children %}
+                                        <option value="{{ child.id }}" 
+                                                {% if expense.child_id == child.id %}selected{% endif %}>
+                                            {{ child.first_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="3">{{ expense.description }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer les modifications
+                            </button>
+                            <a href="{{ url_for('budget.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.required::after {
+    content: " *";
+    color: red;
+}
+</style>
+{% endblock %}

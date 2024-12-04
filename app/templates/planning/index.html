@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Planning Familial - 2familles{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.css" rel="stylesheet">
+<style>
+    .calendar-wrapper {
+        display: flex;
+        margin-top: 20px;
+        gap: 20px;
+        min-height: calc(100vh - 120px);
+    }
+
+    .calendar-sidebar {
+        flex: 0 0 300px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        height: fit-content;
+    }
+
+    .calendar-main {
+        flex: 1;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .event-type-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .event-type-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .event-type-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        margin-right: 10px;
+    }
+
+    .type-medical { background-color: #dc3545; }
+    .type-school { background-color: #198754; }
+    .type-visit { background-color: #0d6efd; }
+    .type-activity { background-color: #ffc107; }
+    .type-other { background-color: #6c757d; }
+
+    .fc-event.event-medical { background-color: #dc3545 !important; border-color: #dc3545 !important; }
+    .fc-event.event-school { background-color: #198754 !important; border-color: #198754 !important; }
+    .fc-event.event-visit { background-color: #0d6efd !important; border-color: #0d6efd !important; }
+    .fc-event.event-activity { background-color: #ffc107 !important; border-color: #ffc107 !important; }
+    .fc-event.event-other { background-color: #6c757d !important; border-color: #6c757d !important; }
+
+    .fc-event {
+        cursor: pointer;
+        padding: 2px 4px;
+    }
+
+    .fc-event:hover {
+        opacity: 0.9;
+    }
+
+    .fc-toolbar-title {
+        text-transform: capitalize;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calendar-wrapper">
+    <!-- Sidebar -->
+    <div class="calendar-sidebar">
+        <h5 class="mb-4">Filtres et Actions</h5>
+        
+        <!-- Types d'événements -->
+        <div class="mb-4">
+            <div class="event-type-item">
+                <div class="event-type-color type-medical"></div>
+                <label class="form-check-label">
+                    <input type="checkbox" class="type-filter" data-type="medical" checked>
+                    Rendez-vous médicaux
+                </label>
+            </div>
+            <div class="event-type-item">
+                <div class="event-type-color type-school"></div>
+                <label class="form-check-label">
+                    <input type="checkbox" class="type-filter" data-type="school" checked>
+                    Activités scolaires
+                </label>
+            </div>
+            <div class="event-type-item">
+                <div class="event-type-color type-visit"></div>
+                <label class="form-check-label">
+                    <input type="checkbox" class="type-filter" data-type="visit" checked>
+                    Visites
+                </label>
+            </div>
+            <div class="event-type-item">
+                <div class="event-type-color type-activity"></div>
+                <label class="form-check-label">
+                    <input type="checkbox" class="type-filter" data-type="activity" checked>
+                    Activités extrascolaires
+                </label>
+            </div>
+            <div class="event-type-item">
+                <div class="event-type-color type-other"></div>
+                <label class="form-check-label">
+                    <input type="checkbox" class="type-filter" data-type="other" checked>
+                    Autres
+                </label>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <button class="btn btn-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#eventModal">
+            <i class="bi bi-plus-circle"></i> Nouvel événement
+        </button>
+
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-download"></i> Exporter
+            </button>
+            <ul class="dropdown-menu w-100">
+                <li><a class="dropdown-item" href="{{ url_for('planning.export_ics') }}">Format iCalendar (.ics)</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('planning.export_csv') }}">Format Excel (.csv)</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Calendrier -->
+    <div class="calendar-main">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+{% include 'planning/_event_modal.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.11.3/locales/fr.min.js"></script>
+<script src="{{ url_for('static', filename='js/planning.js') }}"></script>
+{% endblock %}

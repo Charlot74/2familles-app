@@ -1,0 +1,102 @@
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">Gestion Co-parent</h5>
+    </div>
+    <div class="card-body">
+        {% if current_user.get_coparent() %}
+            {# Affichage du coparent actif #}
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                    <i class="bi bi-person-check-fill fs-1 text-success"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <h6 class="mb-1">Co-parent actif</h6>
+                    {% set coparent = current_user.get_coparent() %}
+                    <p class="mb-0">{{ coparent.first_name }} {{ coparent.last_name }}</p>
+                    <small class="text-muted">{{ coparent.email }}</small>
+                </div>
+            </div>
+        {% else %}
+            {# Formulaire d'invitation #}
+            {% if not current_user.has_pending_coparent_invitation() %}
+                <form action="{{ url_for('coparent.invite_coparent') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="coparent_email" class="form-label">Inviter un co-parent</label>
+                        <div class="input-group">
+                            <input type="email" class="form-control" id="coparent_email" 
+                                   name="email" placeholder="Email du co-parent" required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-envelope"></i> Inviter
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">
+                            Un email d'invitation sera envoyé à cette adresse.
+                        </small>
+                    </div>
+                </form>
+            {% endif %}
+
+            {# Liste des invitations en cours #}
+            {% set pending_invitations = current_user.coparent_invitations_sent.filter_by(status='pending').all() %}
+            {% if pending_invitations %}
+                <div class="mt-4">
+                    <h6 class="mb-3">Invitations en cours</h6>
+                    <div class="list-group">
+                        {% for invitation in pending_invitations %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-1">{{ invitation.recipient_email }}</p>
+                                        <small class="text-muted">
+                                            Envoyée le {{ invitation.created_at.strftime('%d/%m/%Y') }}
+                                        </small>
+                                    </div>
+                                    <form action="{{ url_for('coparent.cancel_invitation', invitation_id=invitation.id) }}" 
+                                          method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {# Invitations reçues #}
+            {% set received_invitations = current_user.get_pending_invitations() %}
+            {% if received_invitations %}
+                <div class="mt-4">
+                    <h6 class="mb-3">Invitations reçues</h6>
+                    <div class="list-group">
+                        {% for invitation in received_invitations %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-1">De : {{ invitation.sender.email }}</p>
+                                        <small class="text-muted">
+                                            Reçue le {{ invitation.created_at.strftime('%d/%m/%Y') }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('coparent.accept_invitation', token=invitation.token) }}" 
+                                           class="btn btn-sm btn-success me-2">
+                                            <i class="bi bi-check-circle"></i>
+                                        </a>
+                                        <form action="{{ url_for('coparent.reject_invitation', token=invitation.token) }}" 
+                                              method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

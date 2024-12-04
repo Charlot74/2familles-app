@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Informations utilisateur -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Mon Profil</h5>
+                    <div class="mb-3">
+                        <strong>Nom :</strong> {{ user.first_name }} {{ user.last_name }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email :</strong> {{ user.email }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Dernière connexion :</strong> {{ stats.last_login }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Co-parent :</strong> {{ stats.coparent }}
+                    </div>
+                    <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-primary">
+                        Modifier mon profil
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendrier -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Calendrier</h5>
+                    <p>Prochains événements</p>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Garde weekend</h6>
+                                <small>Dans 3 jours</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ url_for('main.calendar') }}" class="btn btn-primary">
+                            Voir le calendrier
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Messages</h5>
+                    <p>Messages récents</p>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Pas de nouveaux messages</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ url_for('main.messages') }}" class="btn btn-primary">
+                            Voir les messages
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

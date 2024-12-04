@@ -1,0 +1,58 @@
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+            <i class="bi bi-person-plus me-2"></i>Inviter un co-parent
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if family_info and family_info.coparent %}
+            <div class="d-flex align-items-center">
+                <i class="bi bi-person-check-fill fs-1 me-3 text-success"></i>
+                <div>
+                    <h6 class="mb-1">Co-parent actif</h6>
+                    <p class="mb-0">{{ family_info.coparent.first_name }} {{ family_info.coparent.last_name }}</p>
+                    <small class="text-muted">{{ family_info.coparent.email }}</small>
+                </div>
+            </div>
+        {% else %}
+            <form action="{{ url_for('invitation.send_invitation') }}" method="POST">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email du co-parent</label>
+                    <div class="input-group">
+                        <input type="email" class="form-control" id="email" name="email" 
+                               placeholder="exemple@email.com" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-envelope me-2"></i>Envoyer l'invitation
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        Un email sera envoyé pour inviter le co-parent à rejoindre l'application.
+                    </div>
+                </div>
+            </form>
+
+            {% if current_user.invitations.count() > 0 %}
+                <div class="mt-4">
+                    <h6 class="mb-3">Invitations en cours</h6>
+                    <div class="list-group">
+                    {% for invitation in current_user.invitations %}
+                        {% if invitation.is_pending %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ invitation.email }}</h6>
+                                        <small class="text-muted">
+                                            Envoyée le {{ invitation.created_at.strftime('%d/%m/%Y') }}
+                                        </small>
+                                    </div>
+                                    <span class="badge bg-primary">En attente</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

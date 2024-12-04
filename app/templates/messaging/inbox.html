@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Messagerie{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Sidebar de navigation des messages -->
+        <div class="col-md-3">
+            <div class="list-group mb-4">
+                <a href="{{ url_for('messaging.compose') }}" class="btn btn-primary mb-3">
+                    <i class="fas fa-pen"></i> Nouveau Message
+                </a>
+                <a href="#inbox" class="list-group-item list-group-item-action active" data-bs-toggle="tab">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-inbox"></i> Boîte de réception</span>
+                        {% if unread_count %}
+                            <span class="badge bg-primary rounded-pill">{{ unread_count }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+                <a href="#sent" class="list-group-item list-group-item-action" data-bs-toggle="tab">
+                    <i class="fas fa-paper-plane"></i> Messages envoyés
+                </a>
+            </div>
+        </div>
+        
+        <!-- Contenu principal -->
+        <div class="col-md-9 tab-content">
+            <!-- Boîte de réception -->
+            <div class="tab-pane fade show active" id="inbox">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Boîte de réception</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for message in received_messages %}
+                            <div class="list-group-item {% if not message.read %}list-group-item-primary{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">
+                                        {{ message.subject }}
+                                        {% if not message.read %}
+                                            <span class="badge bg-primary">Nouveau</span>
+                                        {% endif %}
+                                    </h6>
+                                    <small>{{ message.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                </div>
+                                <p class="mb-1">De: {{ message.sender.first_name }} {{ message.sender.last_name }}</p>
+                                <p class="mb-1 text-muted">{{ message.content[:100] }}{% if message.content|length > 100 %}...{% endif %}</p>
+                                <div class="mt-2">
+                                    <a href="{{ url_for('messaging.view_message', message_id=message.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Lire
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="list-group-item text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-2x mb-2"></i>
+                                <p class="mb-0">Votre boîte de réception est vide</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages envoyés -->
+            <div class="tab-pane fade" id="sent">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Messages envoyés</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for message in sent_messages %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ message.subject }}</h6>
+                                    <small>{{ message.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                                </div>
+                                <p class="mb-1">À: {{ message.receiver.first_name }} {{ message.receiver.last_name }}</p>
+                                <p class="mb-1 text-muted">{{ message.content[:100] }}{% if message.content|length > 100 %}...{% endif %}</p>
+                                <div class="mt-2">
+                                    <a href="{{ url_for('messaging.view_message', message_id=message.id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Voir
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="list-group-item text-center text-muted py-4">
+                                <i class="fas fa-paper-plane fa-2x mb-2"></i>
+                                <p class="mb-0">Aucun message envoyé</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .list-group-item-primary {
+        border-left: 4px solid #0d6efd;
+    }
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Liste des conversations -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Conversations</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        Aucune conversation pour le moment
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <!-- Zone de messages -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Messages</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-center text-muted">
+                        Sélectionnez une conversation pour voir les messages
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

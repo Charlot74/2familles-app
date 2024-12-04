@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-bell"></i> Notifications
+                            {% if unread_count %}
+                                <span class="badge bg-primary">{{ unread_count }}</span>
+                            {% endif %}
+                        </h4>
+                        {% if notifications %}
+                        <button class="btn btn-outline-primary btn-sm" id="markAllRead">
+                            <i class="fas fa-check-double"></i> Tout marquer comme lu
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if notifications %}
+                        <div class="list-group list-group-flush">
+                            {% for notification in notifications %}
+                            <div class="list-group-item {% if not notification.read %}list-group-item-light{% endif %}">
+                                <div class="d-flex w-100 justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">
+                                                {% if notification.type == 'message' %}
+                                                    <i class="fas fa-envelope text-primary"></i>
+                                                {% elif notification.type == 'custody' %}
+                                                    <i class="fas fa-calendar-alt text-warning"></i>
+                                                {% elif notification.type == 'budget' %}
+                                                    <i class="fas fa-wallet text-success"></i>
+                                                {% else %}
+                                                    <i class="fas fa-bell text-info"></i>
+                                                {% endif %}
+                                                {{ notification.title }}
+                                            </h6>
+                                            <small class="text-muted">
+                                                {{ notification.created_at|timeago }}
+                                            </small>
+                                        </div>
+                                        <p class="mb-1">{{ notification.content }}</p>
+                                        {% if notification.link %}
+                                        <a href="{{ notification.link }}" class="btn btn-sm btn-link px-0">
+                                            Voir plus
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% if not notification.read %}
+                                    <form action="{{ url_for('messaging.mark_notification_read', notification_id=notification.id) }}" 
+                                          method="POST" class="ms-3">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Marquer comme lu">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-bell-slash fa-3x mb-3"></i>
+                            <p>Aucune notification</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('markAllRead')?.addEventListener('click', function() {
+    fetch("{{ url_for('messaging.mark_all_read') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => {
+        if (response.ok) {
+            window.location.reload();
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+.list-group-item {
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: rgba(0,0,0,0.01);
+}
+
+.list-group-item form button {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.list-group-item:hover form button {
+    opacity: 1;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter une dépense - 2familles{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus-circle"></i> Ajouter une dépense
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('budget.add') }}">
+                        <div class="mb-3">
+                            <label for="title" class="form-label required">Titre</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="amount" class="form-label required">Montant</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0" required>
+                                    <select class="form-select" id="currency" name="currency" style="max-width: 100px;">
+                                        <option value="EUR" {% if current_user.currency == 'EUR' %}selected{% endif %}>€</option>
+                                        <option value="USD" {% if current_user.currency == 'USD' %}selected{% endif %}>$</option>
+                                        <option value="CHF" {% if current_user.currency == 'CHF' %}selected{% endif %}>Fr.</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="date" class="form-label required">Date</label>
+                                <input type="date" class="form-control" id="date" name="date" 
+                                       value="{{ today_date }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="category" class="form-label required">Catégorie</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Sélectionnez une catégorie</option>
+                                    <option value="Alimentation">Alimentation</option>
+                                    <option value="Santé">Santé</option>
+                                    <option value="Éducation">Éducation</option>
+                                    <option value="Vêtements">Vêtements</option>
+                                    <option value="Loisirs">Loisirs</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="child_id" class="form-label">Enfant concerné</label>
+                                <select class="form-select" id="child_id" name="child_id">
+                                    <option value="">Tous les enfants</option>
+                                    {% for child in current_user.family.children %}
+                                        <option value="{{ child.id }}">
+                                            {{ child.first_name }} {{ child.last_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="3" placeholder="Ajoutez des détails sur la dépense..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Enregistrer la dépense
+                            </button>
+                            <a href="{{ url_for('budget.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Format du montant en temps réel
+    const amountInput = document.getElementById('amount');
+    amountInput.addEventListener('input', function(e) {
+        if (this.value.length > 0) {
+            this.value = parseFloat(this.value).toFixed(2);
+        }
+    });
+
+    // Sauvegarde de la devise choisie
+    const currencySelect = document.getElementById('currency');
+    currencySelect.addEventListener('change', function() {
+        fetch("{{ url_for('budget.update_currency') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                currency: this.value
+            })
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+.required::after {
+    content: " *";
+    color: red;
+}
+
+.input-group .form-select {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.card {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.btn {
+    padding: 0.5rem 1.5rem;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+</style>
+{% endblock %}

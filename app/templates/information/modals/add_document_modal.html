@@ -1,0 +1,50 @@
+<div class="modal fade" id="addDocumentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter un document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('information.documents') }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Enfant</label>
+                        <select name="child_id" class="form-select">
+                            <option value="">Sélectionner un enfant (optionnel)</option>
+                            {% for child in children %}
+                            <option value="{{ child.id }}">{{ child.first_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type de document</label>
+                        <select name="type" class="form-select" required>
+                            <option value="medical">Document médical</option>
+                            <option value="scolaire">Document scolaire</option>
+                            <option value="administratif">Document administratif</option>
+                            <option value="juridique">Document juridique</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Titre du document</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fichier</label>
+                        <input type="file" name="document" class="form-control" required>
+                        <small class="form-text text-muted">Formats acceptés: PDF, DOC, DOCX, JPG, PNG (Max: 5MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

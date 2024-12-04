@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Informations Familiales{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Informations Familiales</h2>
+    <a href="{{ url_for('family.add') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Ajouter un enfant
+    </a>
+</div>
+
+<div class="row">
+    {% for info in family_infos %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ info.child_name }}</h5>
+                    <div>
+                        <a href="{{ url_for('family.edit', id=info.id) }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{{ url_for('family.delete', id=info.id) }}" 
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ces informations ?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <p><strong>Date de naissance:</strong> {{ info.child_birthdate.strftime('%d/%m/%Y') }}</p>
+                
+                <div class="mt-3">
+                    <h6 class="text-primary"><i class="fas fa-hospital"></i> Informations médicales</h6>
+                    <p>{{ info.medical_info or 'Aucune information médicale renseignée' }}</p>
+                </div>
+
+                <div class="mt-3">
+                    <h6 class="text-primary"><i class="fas fa-school"></i> Informations scolaires</h6>
+                    <p>{{ info.school_info or 'Aucune information scolaire renseignée' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Aucune information familiale enregistrée.
+            <a href="{{ url_for('family.add') }}" class="alert-link">Ajouter des informations</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

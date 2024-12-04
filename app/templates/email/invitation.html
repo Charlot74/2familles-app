@@ -1,0 +1,113 @@
+mplate email HTML
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation 2Familles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #0d6efd;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #0b5ed7;
+        }
+        .features {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .features ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 12px;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>2Familles</h1>
+            <p>Le trait d'union intelligent pour la co-parentalité</p>
+        </div>
+        
+        <div class="content">
+            <h2>Vous avez reçu une invitation</h2>
+            
+            <p>Bonjour,</p>
+            
+            <p><strong>{{ invitation.inviter.first_name }} {{ invitation.inviter.last_name }}</strong> 
+               vous invite à rejoindre 2Familles en tant que co-parent.</p>
+            
+            <div class="features">
+                <h3>Avec 2Familles, vous pourrez :</h3>
+                <ul>
+                    <li>Gérer facilement le calendrier de garde</li>
+                    <li>Communiquer efficacement avec votre co-parent</li>
+                    <li>Partager et organiser les documents importants</li>
+                    <li>Suivre les dépenses communes</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{ invitation_link }}" class="button">
+                    Accepter l'invitation
+                </a>
+            </div>
+            
+            <p style="color: #6c757d; font-style: italic;">
+                Cette invitation expirera dans 7 jours.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Cet email a été envoyé via 2Familles.</p>
+            <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.</p>
+        </div>
+    </div>
+</body>
+</html>

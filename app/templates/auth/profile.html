@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Profil{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Informations du profil -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="profile-picture mb-4">
+                        <div class="profile-picture-placeholder">
+                            <i class="fas fa-user fa-4x text-muted"></i>
+                        </div>
+                    </div>
+                    <h4>{{ current_user.first_name }} {{ current_user.last_name }}</h4>
+                    <p class="text-muted">{{ current_user.email }}</p>
+                    <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit"></i> Modifier le profil
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statut de la co-parentalité -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Statut Co-parentalité</h5>
+                </div>
+                <div class="card-body">
+                    {% if current_user.coparent %}
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-user-check text-success fa-2x"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">{{ current_user.coparent.first_name }} {{ current_user.coparent.last_name }}</h6>
+                                <small class="text-muted">{{ current_user.coparent.email }}</small>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-3">Aucun coparent associé</p>
+                        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#inviteCoparentModal">
+                            <i class="fas fa-user-plus"></i> Inviter un coparent
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglets d'activités -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#activities">Activités récentes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#settings">Paramètres</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#security">Sécurité</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- Activités récentes -->
+                        <div class="tab-pane fade show active" id="activities">
+                            <div class="timeline">
+                                {% for activity in activities %}
+                                <div class="timeline-item">
+                                    <div class="timeline-date text-muted">{{ activity.date.strftime('%d/%m/%Y') }}</div>
+                                    <div class="timeline-content">
+                                        <h6>{{ activity.title }}</h6>
+                                        <p class="text-muted">{{ activity.description }}</p>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p class="text-muted text-center">Aucune activité récente</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Paramètres -->
+                        <div class="tab-pane fade" id="settings">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Notifications par email</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="emailNotif">
+                                        <label class="form-check-label" for="emailNotif">
+                                            Recevoir les notifications par email
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Langue</label>
+                                    <select class="form-select">
+                                        <option value="fr">Français</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    Enregistrer les paramètres
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Sécurité -->
+                        <div class="tab-pane fade" id="security">
+                            <form class="change-password-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Mot de passe actuel</label>
+                                    <input type="password" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Nouveau mot de passe</label>
+                                    <input type="password" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Confirmer le nouveau mot de passe</label>
+                                    <input type="password" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    Changer le mot de passe
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Modifier Profil -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier le profil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Prénom</label>
+                        <input type="text" class="form-control" value="{{ current_user.first_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <input type="text" class="form-control" value="{{ current_user.last_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" value="{{ current_user.email }}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Inviter Coparent -->
+<div class="modal fade" id="inviteCoparentModal" tabindex="-1">
+    <div class="modal-dialog">

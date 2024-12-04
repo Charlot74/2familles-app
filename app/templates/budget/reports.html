@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Rapports des dépenses - 2familles{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Filtres -->
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Filtres</h5>
+                </div>
+                <div class="card-body">
+                    <form id="filterForm" method="GET">
+                        <div class="mb-3">
+                            <label class="form-label">Période</label>
+                            <select class="form-select" name="period" onchange="this.form.submit()">
+                                <option value="week" {% if current_period == 'week' %}selected{% endif %}>7 derniers jours</option>
+                                <option value="month" {% if current_period == 'month' %}selected{% endif %}>Mois en cours</option>
+                                <option value="year" {% if current_period == 'year' %}selected{% endif %}>Année en cours</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Catégorie</label>
+                            <select class="form-select" name="category" onchange="this.form.submit()">
+                                <option value="">Toutes les catégories</option>
+                                {% for category in categories %}
+                                <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>
+                                    {{ category }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Exporter</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('budget.export_data', format='csv') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-file-csv"></i> Exporter en CSV
+                        </a>
+                        <a href="{{ url_for('budget.export_data', format='pdf') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-file-pdf"></i> Exporter en PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="col-md-9">
+            <!-- Résumé -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-1">Total des dépenses</h6>
+                            <h3 class="mb-0">{{ "%.2f"|format(total_expenses) }} {{ current_user.currency_symbol }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-1">Moyenne par dépense</h6>
+                            <h3 class="mb-0">{{ "%.2f"|format(avg_expense) }} {{ current_user.currency_symbol }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6 class="text-muted mb-1">Nombre de dépenses</h6>
+                            <h3 class="mb-0">{{ expenses|length }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphiques -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Répartition par catégorie</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Liste des dépenses -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Détail des dépenses</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Titre</th>
+                                    <th>Catégorie</th>
+                                    <th>Montant</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in expenses %}
+                                <tr>
+                                    <td>{{ expense.date.strftime('%d/%m/%Y') }}</td>
+                                    <td>{{ expense.title }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ expense.category }}</span>
+                                    </td>
+                                    <td class="text-end">
+                                        {{ "%.2f"|format(expense.amount) }} {{ current_user.currency_symbol }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Données pour le graphique
+    const data = {{ chart_data|tojson }};
+    
+    // Graphique en camembert
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'pie',
+        data: {
+            labels: data.categories,
+            datasets: [{
+                data: data.amounts,
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#4BC0C0',
+                    '#9966FF',
+                    '#FF9F40'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

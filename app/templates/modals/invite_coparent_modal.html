@@ -1,0 +1,82 @@
+<div class="modal fade" id="inviteCoparentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-plus"></i> Inviter un co-parent
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('coparent.invite_coparent') }}" method="POST">
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="first_name" class="form-label required">Prénom</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="last_name" class="form-label required">Nom</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="email" class="form-label required">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Aperçu de l'invitation</h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                Bonjour <span id="previewName" class="fw-bold">________</span>,
+                            </p>
+                            <p class="card-text">Je t'invite à rejoindre 2familles, une plateforme dédiée à la coparentalité. 2familles est un facilitateur de coparentalité qui permet de simplifier le quotidien des parents séparés. Elle propose un agenda partagé, une banque d'informations et des outils pour gérer les finances communes concernant les enfants.</p>
+                            <p class="card-text">L'objectif est d'aider les parents à maintenir une communication efficace et constructive, en plaçant l'intérêt de l'enfant au centre de leurs préoccupations.</p>
+                            <p class="card-text mb-0">J'espère que tu accepteras cette invitation !</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Annuler
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Envoyer l'invitation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.required::after {
+    content: " *";
+    color: red;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const firstNameInput = document.getElementById('first_name');
+    const previewName = document.getElementById('previewName');
+    
+    // Met à jour l'aperçu quand l'utilisateur tape le prénom
+    firstNameInput.addEventListener('input', function() {
+        previewName.textContent = this.value.trim() || '________';
+    });
+
+    // Nettoie le formulaire quand le modal est fermé
+    const modal = document.getElementById('inviteCoparentModal');
+    modal.addEventListener('hidden.bs.modal', function () {
+        document.querySelector('form').reset();
+        previewName.textContent = '________';
+    });
+});
+</script>

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Paramètres</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Préférences de notification</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.settings') }}">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="email_notifications" name="email_notifications" checked>
+                                <label class="form-check-label" for="email_notifications">
+                                    Recevoir les notifications par email
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="calendar_reminders" name="calendar_reminders" checked>
+                                <label class="form-check-label" for="calendar_reminders">
+                                    Rappels des événements du calendrier
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="budget_alerts" name="budget_alerts" checked>
+                                <label class="form-check-label" for="budget_alerts">
+                                    Alertes de budget
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Enregistrer les préférences</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Confidentialité</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.settings') }}">
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="profile_visible" name="profile_visible" checked>
+                                <label class="form-check-label" for="profile_visible">
+                                    Profil visible par les autres utilisateurs
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Mettre à jour la confidentialité</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Actions du compte</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('main.edit_profile') }}" class="btn btn-outline-primary">
+                            Modifier le profil
+                        </a>
+                        <button class="btn btn-outline-danger" 
+                                onclick="return confirm('Êtes-vous sûr de vouloir désactiver votre compte ? Cette action ne peut pas être annulée.')">
+                            Désactiver le compte
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion - 2Familles{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-6 col-lg-5">
+            <!-- Logo et Titre -->
+            <div class="text-center mb-4">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="2Familles" class="mb-4" height="60">
+                <h2 class="fw-bold">Connexion</h2>
+            </div>
+
+            <!-- Messages d'erreur -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Formulaire de connexion -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('auth.login') }}">
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required 
+                                   autocomplete="email" autofocus>
+                        </div>
+
+                        <!-- Mot de passe avec bouton œil -->
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Mot de passe</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" 
+                                       required autocomplete="current-password">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Case à cocher Se souvenir de moi -->
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">Se souvenir de moi</label>
+                        </div>
+
+                        <!-- Bouton de connexion -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liens utiles -->
+            <div class="mt-4 text-center">
+                <p class="mb-2">
+                    <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none">
+                        Mot de passe oublié ?
+                    </a>
+                </p>
+                <p class="text-muted">
+                    Pas encore de compte ? 
+                    <a href="{{ url_for('auth.register') }}" class="text-primary text-decoration-none">
+                        S'inscrire
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script pour le bouton œil -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+        // Change le type de l'input
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        
+        // Change l'icône
+        this.querySelector('i').classList.toggle('bi-eye');
+        this.querySelector('i').classList.toggle('bi-eye-slash');
+    });
+});
+</script>
+
+<style>
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.form-control:focus {
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.btn-primary {
+    background-color: #3B82F6;
+    border-color: #3B82F6;
+}
+
+.btn-primary:hover {
+    background-color: #2563EB;
+    border-color: #2563EB;
+}
+
+.form-check-input:checked {
+    background-color: #3B82F6;
+    border-color: #3B82F6;
+}
+
+.text-primary {
+    color: #3B82F6 !important;
+}
+
+.btn-outline-secondary {
+    border-color: #ced4da;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    border-color: #ced4da;
+    color: #212529;
+}
+
+.alert {
+    border: none;
+    border-radius: 8px;
+}
+
+.alert-danger {
+    background-color: #FEE2E2;
+    color: #991B1B;
+}
+
+.alert-success {
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+</style>
+{% endblock %}

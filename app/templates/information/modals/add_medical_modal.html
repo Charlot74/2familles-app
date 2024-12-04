@@ -1,0 +1,40 @@
+<div class="modal fade" id="addMedicalModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter une information médicale</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('information.medical') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Enfant</label>
+                        <select name="child_id" class="form-select" required>
+                            <option value="">Sélectionner un enfant</option>
+                            {% for child in children %}
+                            <option value="{{ child.id }}">{{ child.first_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select name="type" class="form-select" required>
+                            <option value="allergie">Allergie</option>
+                            <option value="traitement">Traitement</option>
+                            <option value="maladie">Maladie chronique</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

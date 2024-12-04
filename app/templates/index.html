@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <!-- Logo centré -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="2Familles" class="img-fluid" style="max-width: 200px;">
+        </div>
+    </div>
+
+    <!-- Titre et sous-titre -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="display-4 text-danger mb-4">2FAMILLES</h1>
+            <h2 class="h3 mb-4">Le trait d'union intelligent<br>pour la co-parentalité</h2>
+            <p class="lead text-muted">
+                Nous aidons les parents séparés ou divorcés à s'organiser<br>
+                pour le bien-être de leurs enfants.
+            </p>
+        </div>
+    </div>
+
+    <!-- Boutons de connexion/inscription -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg me-3">Connexion</a>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg">Inscription</a>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<style>
+.display-4 {
+    font-weight: bold;
+    color: #dc3545;
+}
+</style>
+{% endblock %}
+{% endblock %}

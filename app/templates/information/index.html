@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block title %}Informations - 2familles{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Barre latérale pour la navigation -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="#medical" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                            <i class="fas fa-hospital"></i> Médical
+                        </a>
+                        <a href="#school" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                            <i class="fas fa-school"></i> Scolaire
+                        </a>
+                        <a href="#documents" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                            <i class="fas fa-file-alt"></i> Documents
+                        </a>
+                        <a href="#emergency" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                            <i class="fas fa-phone"></i> Urgence
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Section Médicale -->
+                <div class="tab-pane fade show active" id="medical">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-hospital"></i> Informations Médicales</h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addMedicalModal">
+                                <i class="fas fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            {% if information %}
+                                {% for info in information %}
+                                    {% if info.type == 'medical' %}
+                                        <div class="mb-3 p-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-top">
+                                                <div>
+                                                    <h6 class="mb-1">{{ info.title }}</h6>
+                                                    <p class="mb-1">{{ info.content }}</p>
+                                                    {% if info.child %}
+                                                        <small class="text-muted">Enfant: {{ info.child.first_name }}</small>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                                            onclick="window.location.href='{{ url_for('information.edit', id=info.id) }}'">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <form action="{{ url_for('information.delete', id=info.id) }}" 
+                                                          method="POST" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-center text-muted my-3">Aucune information médicale enregistrée</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Scolaire -->
+                <div class="tab-pane fade" id="school">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-school"></i> Informations Scolaires</h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addSchoolModal">
+                                <i class="fas fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            {% if information %}
+                                {% for info in information %}
+                                    {% if info.type == 'school' %}
+                                        <div class="mb-3 p-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-top">
+                                                <div>
+                                                    <h6 class="mb-1">{{ info.title }}</h6>
+                                                    <p class="mb-1">{{ info.content }}</p>
+                                                    {% if info.child %}
+                                                        <small class="text-muted">Enfant: {{ info.child.first_name }}</small>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                                            onclick="window.location.href='{{ url_for('information.edit', id=info.id) }}'">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <form action="{{ url_for('information.delete', id=info.id) }}" 
+                                                          method="POST" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-center text-muted my-3">Aucune information scolaire enregistrée</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Documents -->
+                <div class="tab-pane fade" id="documents">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-file-alt"></i> Documents Importants</h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                                <i class="fas fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            {% if information %}
+                                {% for info in information %}
+                                    {% if info.type == 'document' %}
+                                        <div class="mb-3 p-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-top">
+                                                <div>
+                                                    <h6 class="mb-1">{{ info.title }}</h6>
+                                                    <p class="mb-1">{{ info.content }}</p>
+                                                    {% if info.child %}
+                                                        <small class="text-muted">Enfant: {{ info.child.first_name }}</small>
+                                                    {% endif %}
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                                            onclick="window.location.href='{{ url_for('information.edit', id=info.id) }}'">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <form action="{{ url_for('information.delete', id=info.id) }}" 
+                                                          method="POST" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-center text-muted my-3">Aucun document enregistré</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Urgence -->
+                <div class="tab-pane fade" id="emergency">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-phone"></i> Contacts d'Urgence</h5>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEmergencyModal">
+                                <i class="fas fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            {% if information %}
+                                {% for info in information %}
+                                    {% if info.type == 'emergency' %}
+                                        <div class="mb-3 p-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-top">
+                                                <div>
+                                                    <h6 class="mb-1">{{ info.title }}</h6>
+                                                    <p class="mb-1">{{ info.content }}</p>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                                            onclick="window.location.href='{{ url_for('information.edit', id=info.id) }}'">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <form action="{{ url_for('information.delete', id=info.id) }}" 
+                                                          method="POST" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-center text-muted my-3">Aucun contact d'urgence enregistré</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'information/modals/add_medical_modal.html' %}
+{% include 'information/modals/add_school_modal.html' %}
+{% include 'information/modals/add_document_modal.html' %}
+{% include 'information/modals/add_emergency_modal.html' %}
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.list-group-item {
+    border: none;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.5rem !important;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.list-group-item.active {
+    background-color: #0d6efd;
+    border: none;
+}
+
+.list-group-item i {
+    margin-right: 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.border {
+    border-color: #dee2e6 !important;
+}
+
+.border-rounded {
+    border-radius: 0.5rem !important;
+}
+</style>
+{% endblock %}
